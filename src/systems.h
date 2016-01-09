@@ -1,0 +1,20 @@
+#ifndef NAUMS_SYSTEMS
+#define NAUMS_SYSTEMS
+
+namespace Collection
+{
+    enum Systems
+    {
+        NES=1, SNES=2, N64=3, GAMECUBE=4, WII=5, WIIU=6, NX=7,
+        PS1=11, PS2=12, PS3=13, PS4=14, 
+        MASTERSYSTEM=21, MEGADRIVE=22, SATURN=23, DREAMCAST=24, 
+        XBOX=31, XBOX360=32, XBOXONE=33,
+        WINDOWS=91, LINUX=92, MACOSX=93,
+        GAMEBOY=101, GAMEBOYCOLOR=102, GAMEBOYADVANCE=103, NDS=104, N3DS=105,
+        PSP=111, PSVITA=112
+    };
+    
+    
+}
+
+#endif
