@@ -6,7 +6,7 @@
 #include "base/arraylist.h"
 #include <iostream>
 
-#include "mysql/mysql.h"
+#include "mysql/store.h"
 #include "base/dictionary.h"
 
 /**
@@ -18,7 +18,7 @@ class Interface
         /// the maximal current ID (useful for adding a new game)
         int maxId;
         /// the database-connection for getting games and saving data
-        mysql* db;
+        dbstore* db;
         /// the configuration-data
         base::Dictionary* cfg;
         
@@ -43,7 +43,7 @@ class Interface
         /**
          * \brief sets the database-connection in the interface-object
          **/
-        void setDatabase ( mysql* d );
+        void setDatabase ( dbstore* d );
         /**
          * \brief sets the configuration-dictionary in the interface-object
          **/
@@ -58,6 +58,10 @@ class Interface
          * \brief opens a form for adding a new game
          **/
         void addNewGame ();
+        
+        void removeGame ();
+        void editGame();
+        
         /**
          * \brief adds a game to the collection
          **/

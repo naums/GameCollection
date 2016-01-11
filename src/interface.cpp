@@ -13,7 +13,7 @@ Interface::~Interface()
     //this->collection.clean();
 }
 
-void Interface::setDatabase ( mysql* d )
+void Interface::setDatabase ( dbstore* d )
 {
     this->db = d;
 }
@@ -25,7 +25,8 @@ void Interface::setConfig ( base::Dictionary* c )
 
 void Interface::loadGames ()
 {
-    mysqlpp::StoreQueryResult res = db->query ( "SELECT * FROM game ORDER BY title ASC" );
+    mysql* msql = db->getMySQL();
+    mysqlpp::StoreQueryResult res = msql->query ( "SELECT * FROM game ORDER BY title ASC" );
     for (size_t i = 0; i<res.num_rows(); i++)
     {
         int id = res[i]["id"];
@@ -49,14 +50,21 @@ void Interface::mainloop ()
         switch (input)
         {
             case 'l':
-                this->printList ();
+                //this->printList ();
                 break;
             case 'a':
                 this->addNewGame ();
                 break;
+            case 'r':
+                this->removeGame ();
+                break;
+            case 'e':
+                this->editGame ();
             default:
                 break;
         }
+        
+        this->printList();
 
         input = getchar ();
     }
@@ -93,8 +101,120 @@ void Interface::addNewGame()
     int year = base::date_parser::atoi ( &date.c_str()[6],4 );
     
     this->maxId++;
-    Collection::Game* ng = new Collection::Game ( this->maxId, name, developer, publisher, base::date::mktime ( day, month, year ) );
+    Collection::Game* ng = new Collection::Game ( this->maxId, name, publisher, developer, base::date::mktime ( day, month, year ) );
     this->collection.add ( ng );
+    
+    db->addGame ( ng );
+}
+
+void Interface::removeGame ()
+{
+    std::cout << "Spiel löschen" << std::endl 
+              << "-------------" << std::endl 
+              << "ID: ";
+    int id;
+    std::cin >> id;
+    
+    if (id<0 || id>this->maxId) 
+    {
+        std::cout << "Es gibt nichts zu löschen" << std::endl;
+        return;
+    }
+    
+    for (int i=0; i<collection.getSize(); i++)
+    {
+        Collection::Game* mygame = collection.getValue(i);
+        if (mygame->id == id)
+        {
+            collection.remove ( i );
+            db->deleteGame ( mygame );
+            std::cout << "Habe Spiel "<< mygame->name << " gelöscht" << std::endl;
+            delete mygame;
+            return;
+        }   
+    }
+    
+    std::cout << "Es gibt nichts zu löschen" << std::endl;
+    return;
+}
+
+void Interface::editGame ()
+{
+    std::cout << "Spiel bearbeiten" << std::endl 
+              << "-------------" << std::endl 
+              << "ID: ";
+    int id;
+    std::cin >> id;
+    
+    if (id<0 || id>this->maxId) 
+    {
+        std::cout << "Es gibt nichts zu bearbeiten" << std::endl;
+        return;
+    }
+    
+    Collection::Game* mygame;
+    for (int i=0; i<collection.getSize(); i++)
+    {
+        mygame = collection.getValue(i);
+        if (mygame->id == id)
+        {
+            break;
+        }   
+    }
+    
+    base::date* releasedate = new base::date ( mygame->releasedate );
+    std::cout << "Folgendes Spiel wurde gewählt:"
+              << "> Titel:             " << mygame->name << std::endl
+              << "> Publisher:         " << mygame->publisher << std::endl
+              << "> Developer:         " << mygame->publisher << std::endl
+              << "> Erscheinungsdatum: " << releasedate->toString ( base::DDMMYYYY ) << std::endl << std::endl;
+              
+    std::string name, developer, publisher, date;
+    std::cout << "Name: "; 
+    std::cin >> name;
+    std::cout << "Developer: ";
+    std::cin >> developer;
+    std::cout << "Publisher: ";
+    std::cin >> publisher;
+    std::cout << "Erscheinungsdatum (dd.mm.YYYY): ";
+    std::cin >> date;
+    
+    bool changed = false;
+    
+    if (date.length() >= 10)
+    {
+        int day = base::date_parser::atoi ( &date.c_str()[0],2 );
+        int month = base::date_parser::atoi ( &date.c_str()[3],2 );
+        int year = base::date_parser::atoi ( &date.c_str()[6],4 );
+        
+        mygame->releasedate = base::date::mktime ( day, month, year );
+        changed = true;
+    }
+    if (name.length() >= 1)
+    {
+        mygame->name = name;
+        changed = true;
+    }
+    if (developer.length() >= 1)
+    {
+        mygame->developer = developer;
+        changed = true;
+    }
+    if (publisher.length() >= 1)
+    {
+        mygame->publisher = publisher;
+        changed = true;
+    }
+    
+    if (changed)
+    {
+        db->storeGame ( mygame );
+        std::cout << "Spiel " << mygame->name << " wurde gespeichert" << std::endl;
+    }
+    else
+    {
+        std::cout << "Nichts geändert, speichere nicht erneut" << std::endl;
+    }
 }
 
 void Interface::addExistingGame ( Collection::Game* ng )
@@ -103,6 +223,6 @@ void Interface::addExistingGame ( Collection::Game* ng )
     {
         this->maxId = ng->id;
     }
-    
+
     this->collection.add ( ng );
 }

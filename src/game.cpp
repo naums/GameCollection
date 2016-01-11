@@ -10,14 +10,4 @@ namespace Collection
         this->developer = developer;
         this->releasedate = base::date(releasedate);
     }
-    
-    void Game::addSystem ( enum Systems sys )
-    {
-        systems.add ( sys );
-    }
-    
-    void Game::removeSystem ( enum Systems sys )
-    {
-        systems.remove ( systems.index(sys) );
-    }
 }

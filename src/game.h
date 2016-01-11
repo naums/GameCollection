@@ -26,8 +26,7 @@ namespace Collection
             std::string keywords;
             /// the releasedate of the game
             base::date releasedate;
-            /// systems, the game was released on (change to an 64 bit int - bitmap and a mapping-table with strings?)
-            base::ArrayList<enum Systems> systems;
+
         
             /**
              * \brief constructor, will set the necessary values
@@ -37,17 +36,6 @@ namespace Collection
              * \param[in] releasedate the date of release of the game
              **/
             Game ( int id, std::string name, std::string publisher, std::string developer, time_t releasedate );
-            
-            /**
-             * \brief adds a system to the list of systems 
-             * \note change to an 64 bit int - bitmap and a mapping-table with strings?
-             **/
-            void addSystem ( enum Systems sys );
-            /**
-             * \brief removes a system from the list of systems
-             * \note change to an 64 bit int - bitmap and a mapping-table with strings?
-             **/
-            void removeSystem ( enum Systems sys );
             
             /**
              * \brief retrieves the timestamp from a date (dd.mm.YYYY)

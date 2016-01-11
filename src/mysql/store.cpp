@@ -3,18 +3,15 @@
 
 #include <cstdlib>
 
-dbstore* dbstore::connect ( config* c )
+dbstore* dbstore::connect ( const char* srv, const char* usr, const char* pass, const char* dbname )
 {
     dbstore* tmp = new dbstore();
-    tmp->cfg = c;
-    tmp->db = mysql::connect ( c->mysql_server, c->mysql_username, 
-                               c->mysql_passwd, c->mysql_dbname );
+    tmp->db = mysql::connect ( srv, usr, pass, dbname );
     if (tmp->db)
         return tmp;
     else
     {
-        debug::log ("No DB Connection, %s, %s, (pass), %s", c->mysql_server, c->mysql_username, 
-                              c->mysql_dbname );
+        debug::log ("No DB Connection, %s, %s, (pass ;)), %s", srv, usr, dbname );
         return NULL;
     }
 }
@@ -28,7 +25,8 @@ void dbstore::storeGame ( Collection::Game* game )
 {                
     mysqlpp::Query q (db->getConnection());
     q << "UPDATE game "
-      << "SET title='" << game->name << "', publisher='" << game->publisher << "', developer='" << game->developer << "', releasedate=" << game->releasedate
+      << "SET title='" << game->name << "', publisher='" << game->publisher << "', developer='" << game->developer 
+            << "', releasedate=" << game->releasedate.getTimestamp()
       << "WHERE id=" << game->id;
     db->put ( q );
 }
@@ -37,7 +35,8 @@ void dbstore::addGame ( Collection::Game* game )
 {
     mysqlpp::Query q (db->getConnection());
     q << "INSERT INTO game (id, title, publisher, developer, releasedate, cover, system, keywords)"
-      << "VALUES (" << game->id << ",'" << game->name << "','" << game->publisher << "','" << game->developer << "'," << game->releasedate << ", '', '', '')";
+      << "VALUES (" << game->id << ",'" << game->name << "','" << game->publisher << "','" 
+                    << game->developer << "'," << game->releasedate.getTimestamp() << ", '', '', '')";
     db->put ( q );
 }
 

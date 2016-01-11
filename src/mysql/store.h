@@ -19,7 +19,7 @@ class dbstore
          * \param[in] c the config-object, which contains database-names and accountinfo and stuff
          * \return a valid object for using the MySQL-Database
          **/
-        static dbstore* connect ( config* c );
+        static dbstore* connect ( const char* srv, const char* usr, const char* pass, const char* dbname );
         
         /**
          * \brief executes an arbitrary query and returns the results

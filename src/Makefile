@@ -1,7 +1,7 @@
 CC=g++
 CPPFLAGS=-Wall -pedantic -g
 LIBS=-lmysqlpp
-FILES=main.o interface.o game.o base/date.o base/date_parser.o mysql/mysql.o base/debug.o base/file.o base/dictionary.o
+FILES=main.o interface.o game.o base/date.o base/date_parser.o mysql/mysql.o base/debug.o base/file.o base/dictionary.o mysql/store.o
 OUT=gamecollection
 
 all: $(FILES)
