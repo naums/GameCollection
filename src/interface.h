@@ -55,6 +55,11 @@ class Interface
         void printList ();
         
         /**
+         * \brief prints helptext to the screen
+         **/
+        void printHelp();
+        
+        /**
          * \brief opens a form for adding a new game
          **/
         void addNewGame ();

@@ -1,6 +1,8 @@
 #include "interface.h"
 #include "base/date.h"
 #include "base/date_parser.h"
+#include "base/string.h"
+
 
 Interface::Interface () 
 {
@@ -41,14 +43,22 @@ void Interface::loadGames ()
     }
 }
 
+void Interface::printHelp()
+{
+    printf ("Following commands are allowed: \n  l   -> print gamelist \n  a   -> add new game \n  r   -> remove a game \n  e   -> edit an existing game \n  h   -> print this helptext\n  q|x -> exit the application");
+}
+
 void Interface::mainloop ()
 {
     char input = 'l';
 
-    while ( input != 'x' )
+    while ( input != 'x' && input != 'q' )
     {
         switch (input)
         {
+            //case '\n' : case '\r': case ' ': case '\t':
+            //    continue;
+            //    break;
             case 'l':
                 //this->printList ();
                 break;
@@ -60,6 +70,10 @@ void Interface::mainloop ()
                 break;
             case 'e':
                 this->editGame ();
+                break;
+            case 'h':
+                this->printHelp ();
+                break;
             default:
                 break;
         }
@@ -88,13 +102,13 @@ void Interface::addNewGame()
 {
     std::string name, developer, publisher, date;
     std::cout << "Name: "; 
-    std::cin >> name;
+    string::readline ( name );
     std::cout << "Developer: ";
-    std::cin >> developer;
+    string::readline ( developer );
     std::cout << "Publisher: ";
-    std::cin >> publisher;
+    string::readline ( publisher );
     std::cout << "Erscheinungsdatum (dd.mm.YYYY): ";
-    std::cin >> date;
+    string::readline ( date );
     
     int day = base::date_parser::atoi ( &date.c_str()[0],2 );
     int month = base::date_parser::atoi ( &date.c_str()[3],2 );
