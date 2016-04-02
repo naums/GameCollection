@@ -1,2 +1,6 @@
 all:
-	ghc game.hs
+	ghc main.hs
+
+clean:
+	rm *.o 
+	rm *.hi
