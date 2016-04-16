@@ -1,6 +1,9 @@
+GHC=ghc
+
 all:
-	ghc main.hs
+	$(GHC) main.hs
 
 clean:
 	rm *.o 
 	rm *.hi
+	rm main
