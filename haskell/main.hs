@@ -14,8 +14,8 @@ inputNewGame = do putStrLn "Titel: "
                   p <- getLine
                   return (Game t d p)
 
-editGame :: IO()
-editGame = return ()
+mainEditGame :: IO()
+mainEditGame = return ()
 
 --deleteGame :: IO()
 --deleteGame = return ()
@@ -32,7 +32,18 @@ runAction action conn
                          return ()
     | action == "l" = do printGameTable conn
                          return ()
-    | action == "e" = do return ()
+    | action == "e" = do printGameTable conn
+                         putStrLn "Welches Spiel bearbeiten (int):"
+                         i <- getLine 
+                         putStrLn "Titel: "
+                         t <- getLine
+                         putStrLn "Developer: "
+                         d <- getLine
+                         putStrLn "Publisher: "
+                         p <- getLine
+                         game <- queryGame conn (read i :: Integer)
+                         editGame conn (read i :: Integer) game t d p
+                         return ()
     | otherwise = return ()
 
 main :: IO()
