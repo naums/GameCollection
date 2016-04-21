@@ -13,7 +13,7 @@ unpackList (x:xs) = (packGame x) ++ unpackList xs
 
 packGame :: [SqlValue] -> [Game]
 packGame [] = []
-packGame (i:x:y:z:xs) = [(Game (fromSql x) (fromSql y) (fromSql z))]
+packGame (i:x:y:z:xs) = [(Game (fromSql i) (fromSql x) (fromSql y) (fromSql z))]
 
 printRows :: [[SqlValue]] -> IO()
 printRows [] = return ()
@@ -48,13 +48,13 @@ recvGameList conn = do rows <- queryGameList conn
                        return (unpackList rows)
 
 insertGame :: Connection -> Game -> IO(Game)
-insertGame conn (Game t d p) = do x <- run conn ("INSERT INTO game (title, developer, publisher) VALUES ('"++t++"', '"++d++"','"++p++"');") [] 
-                                  commit conn
-                                  putStrLn (show x ++ " Rows modified")
-                                  return (Game t d p)
+insertGame conn (Game i t d p) = do x <- run conn ("INSERT INTO game (title, developer, publisher) VALUES ('"++t++"', '"++d++"','"++p++"');") [] 
+                                    commit conn
+                                    putStrLn (show x ++ " Rows modified")
+                                    return (Game i t d p)
 
-editGame :: Connection -> Integer -> Game -> String -> String -> String -> IO(Bool)
-editGame conn id (Game t d p) title developer publisher = 
+editGame :: Connection -> Game -> String -> String -> String -> IO(Bool)
+editGame conn (Game id t d p) title developer publisher = 
     if (i <= 0)
         then return (False)
     else

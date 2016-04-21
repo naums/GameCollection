@@ -1,9 +1,17 @@
 module Game where
 
-data Game = Game Titel Developer Publisher
-type Titel = String
-type Developer = String
-type Publisher = String
+-- Game class for representating a game
+-- \member gameId the ID in the database of the game
+-- \member gameTitle the title of the game
+-- \member gameDeveloper the developer of the game
+-- \member gamePublisher the publisher of the game
+data Game = Game {
+    gameId :: Integer, 
+    gameTitle :: String, 
+    gameDeveloper :: String, 
+    gamePublisher :: String
+}
+
 
 addList :: [Game] -> Game -> [Game]
 addList [] a = [a]
@@ -11,20 +19,21 @@ addList xs a = xs ++ [a]
 
 printList :: [Game] -> IO([Game])
 printList [] = return ( [] )
-printList ((Game t d p):xs) = do putStrLn ( t ++ " -> " ++ d ++ " -> " ++ p )
-                                 ps <- printList xs
-                                 return ( [(Game t d p)] ++ ps)
+printList ((Game i t d p):xs) = do putStrLn ( "["++ show i ++"] " ++t ++ " -> " ++ d ++ " -> " ++ p )
+                                   ps <- printList xs
+                                   return ( [(Game i t d p)] ++ ps)
 
 removeList :: [Game] -> String -> [Game]
 removeList [] _ = []
-removeList ((Game t d p):xs) title = if (t == title) then
-                                        removeList xs title
-                                     else
-                                        [(Game t d p)] ++ removeList xs title 
+removeList ((Game i t d p):xs) title = 
+     if (t == title) then
+        removeList xs title
+     else
+        [(Game i t d p)] ++ removeList xs title 
 
-sortList :: [Game] -> [Game]
-sortList [] = []
-sortList [x] = [x]
-sortList ((Game ti de pu):xs) = sortList [(Game t d p)| (Game t d p) <- xs, t < ti] ++ [(Game ti de pu)] ++ sortList [(Game t d p)| (Game t d p) <- xs, t > ti]
+--sortList :: [Game] -> [Game]
+--sortList [] = []
+--sortList [x] = [x]
+--sortList ((Game id ti de pu):xs) = sortList [m| m <- xs, t <- (gameTitle m), compare t ti == LT] ++ [(Game id ti de pu)] ++ sortList [m| m <- xs, t <- (gameTitle m), compare t ti == GT]
 
 

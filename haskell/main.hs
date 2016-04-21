@@ -16,7 +16,7 @@ inputNewGame = do putStrLn "Titel: "
                   d <- getLine
                   putStrLn "Publisher: "
                   p <- getLine
-                  return (Game t d p)
+                  return (Game 0 t d p)
 
 mainEditGame :: IO()
 mainEditGame = return ()
@@ -51,13 +51,13 @@ runAction (action:args) conn
            putStrLn "Publisher: "
            p <- getLine
            game <- queryGame conn (read i :: Integer)
-           editGame conn (read i :: Integer) game t d p
+           editGame conn game t d p
            runAction args conn
     | action == "p" || action == "-p" = 
         do printGameTable conn
-           (Game t d p) <- queryGame conn (read (head args) :: Integer)
-           putStrLn t
-           ebayQuery conn t (read (head args) :: Integer)
+           game <- queryGame conn (read (head args) :: Integer)
+           putStrLn $ gameTitle game
+           ebayQuery conn game
            runAction args conn
     | action == "r" || action == "-r"  = 
         do ebayClearCache conn

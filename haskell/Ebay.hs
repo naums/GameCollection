@@ -24,8 +24,8 @@ ebayClearCache conn = do x <- run conn ("DELETE FROM game_price") []
                          putStrLn ("Deleted " ++ (show x) ++ " rows");
                          return x
 
-ebayQuery :: Connection -> String -> Integer -> IO ()
-ebayQuery conn title gameId = 
+ebayQuery :: Connection -> Game -> IO ()
+ebayQuery conn (Game gameId title _ _) = 
     do searchResult <- simpleSearchWithVerb config searchRequest
        y <- ebayStoreResults conn gameId searchResult
        putStrLn (show y ++ " Entries saved")
