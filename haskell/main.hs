@@ -10,28 +10,36 @@ import Database.HDBC.Sqlite3
 import System.Environment
 
 inputNewGame :: IO(Game)
-inputNewGame = do putStrLn "Titel: "
-                  t <- getLine
-                  putStrLn "Developer: "
-                  d <- getLine
-                  putStrLn "Publisher: "
-                  p <- getLine
-                  return (Game 0 t d p)
+inputNewGame = 
+    do putStrLn "Titel: "
+       t <- getLine
+       putStrLn "Developer: "
+       d <- getLine
+       putStrLn "Publisher: "
+       p <- getLine
+       return (Game 0 t d p)
 
-mainEditGame :: IO()
-mainEditGame = return ()
-
---deleteGame :: IO()
---deleteGame = return ()
+mainEditGame :: IO(Game)
+mainEditGame = 
+    do putStrLn "Welches Spiel bearbeiten (int):"
+       i <- getLine 
+       putStrLn "Titel: "
+       t <- getLine
+       putStrLn "Developer: "
+       d <- getLine
+       putStrLn "Publisher: "
+       p <- getLine
+       return (Game (read i::Integer) t d p)
 
 helptext :: IO()
 helptext = 
     do progname <- getProgName
        versiontext
-       putStrLn ("Usage: "++ progname ++ " (OPTIONS)")
+       putStrLn ("\nUsage: "++ progname ++ " (OPTIONS)")
        putStrLn ("Will execute the options iteratively")
        putStrLn ("\nOptions:")
        putStrLn ("  -a | --add           add a game")
+       putStrLn ("  -ba | --bulk-add (title) (publisher) (developer)");
        putStrLn ("  -e | --edit          edit a game")
        putStrLn ("  -d | --delete        delete a game from database");
        putStrLn ("  -l | --list          list games")
@@ -57,6 +65,10 @@ runAction (action:args) conn
         do y <- inputNewGame
            insertGame conn y
            runAction args conn
+    | action == "ba" || action =="-ba" || action =="--bulk-add" =
+        do insertGame conn (Game 0 (args!!0) (args!!1) (args!!2))
+           putStrLn ("adding game: "++(args!!0)++" - " ++ (args!!1)++ " -- " ++ (args!!2))
+           runAction args conn
     | action == "d" || action == "-d" || action == "--remove" = 
         do printGameTable conn
            putStrLn "Welches Spiel löschen (int):"
@@ -68,15 +80,8 @@ runAction (action:args) conn
            runAction args conn
     | action == "e" || action == "-e" || action =="--edit" = 
         do printGameTable conn
-           putStrLn "Welches Spiel bearbeiten (int):"
-           i <- getLine 
-           putStrLn "Titel: "
-           t <- getLine
-           putStrLn "Developer: "
-           d <- getLine
-           putStrLn "Publisher: "
-           p <- getLine
-           game <- queryGame conn (read i :: Integer)
+           (Game i t d p ) <- mainEditGame 
+           game <- queryGame conn i
            editGame conn game t d p
            runAction args conn
     | action == "p" || action == "-p" || action =="--price" = 
