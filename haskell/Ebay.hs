@@ -39,22 +39,24 @@ ebayQuery conn (Game gameId title _ _) =
   where
     condition = "New"
     keywords = pack(title)
-    config = defaultEbayConfig { ebDomain = "svcs.sandbox.ebay.com"
-                                 -- ^ Use `svcs.sandbox.ebay.com` when
-                                 --   connecting to sandbox.
-                               , ebAppId = "StefanNa-GameAccu-SBX-33890c490-77cdf594"
-                               , ebDebug = False
-                               , ebSiteId = "EBAY-DE" -- "EBAY-DE"
-                               , ebHttps = False
-                               }
+    config = defaultEbayConfig { 
+        ebDomain = "svcs.sandbox.ebay.com"
+         -- ^ Use `svcs.sandbox.ebay.com` when
+         --   connecting to sandbox.
+       , ebAppId = "StefanNa-GameAccu-SBX-33890c490-77cdf594"
+       , ebDebug = False
+       , ebSiteId = "EBAY-DE" -- "EBAY-DE"
+       , ebHttps = False
+       }
     -- Find items by keywords.
-    search = Search { searchKeywords = keywords
-                    , searchOutputSelector = Just PictureURLLarge
-                    , searchSortOrder = Nothing
-                    , searchItemFilter = [ ItemFilter ("Condition", condition) ]
-                    , searchAffiliateInfo = Nothing
-                    , searchProductId = Nothing
-                    }
+    search = Search { 
+          searchKeywords = keywords
+        , searchOutputSelector = Just PictureURLLarge
+        , searchSortOrder = Nothing
+        , searchItemFilter = [ ItemFilter ("Condition", condition) ]
+        , searchAffiliateInfo = Nothing
+        , searchProductId = Nothing
+        }
 
     searchRequest = SearchRequest FindItemsByKeywords search
 
@@ -72,7 +74,7 @@ ebayPrintListRow (x:xs) =
 
 ebayListCache :: Connection -> IO()
 ebayListCache conn = 
-    do x <- quickQuery' conn "SELECT ebayPrice, ebayURL, ebayGallery, ebayTitle, gameId FROM game_price ORDER BY ebayPrice ASC" []
+    do x <- quickQuery' conn "SELECT ebayPrice, ebayURL, ebayGallery, ebayTitle, gameId FROM game_price ORDER BY gameId ASC" []
        ebayPrintListRow x
 
 ebayStoreResults :: Connection -> Integer -> Maybe SearchResponse -> IO(Integer)
@@ -84,12 +86,13 @@ ebayStoreResults conn gameId sr = case sr of
 ebayStoreSingleResult :: Connection -> [SearchItem] -> Integer -> Integer -> IO(Integer)
 ebayStoreSingleResult _ [] count _ = return count
 ebayStoreSingleResult conn (x:xs) count gameId = 
-    do x <- run conn ("INSERT INTO game_price (gameId, ebayTitle, ebayURL, ebayPrice, ebayGallery) VALUES (" 
-                       ++ show gameId ++ ", '"
-                       ++ unpack (searchItemTitle x) ++ "', '" 
-                       ++ unpack (searchItemViewItemUrl x) ++ "', "
-                       ++ show (sellingStatusConvertedCurrentPrice (searchItemSellingStatus x)) ++ ",'"
-                       ++ galleryUrl ++ "')") [] 
+    do x <- run conn (
+           "INSERT INTO game_price (gameId, ebayTitle, ebayURL, ebayPrice, ebayGallery) VALUES (" 
+           ++ show gameId ++ ", '"
+           ++ unpack (searchItemTitle x) ++ "', '" 
+           ++ unpack (searchItemViewItemUrl x) ++ "', "
+           ++ show (sellingStatusConvertedCurrentPrice (searchItemSellingStatus x)) ++ ",'"
+           ++ galleryUrl ++ "')") [] 
        commit conn
        putStrLn (show x ++ " Rows modified")
        ebayStoreSingleResult conn xs (count+1) gameId

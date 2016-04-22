@@ -91,16 +91,18 @@ runAction (action:args) conn
            ebayQuery conn game
            runAction args conn
     | action == "s" || action == "-s" || action == "--show" =
-           ebayListCache conn
+        do ebayListCache conn
+           runAction args conn
     | action == "pa" || action == "-pa" || action =="--price-all" = 
         do games <- recvGameList conn
            ebayQueryList conn games
-           return ()
+           runAction args conn
     | action == "r" || action == "-r" || action == "--clear-cache"  = 
         do ebayClearCache conn
            runAction args conn
     | action == "v" || action == "-v" || action =="--version" =
-        versiontext
+        do versiontext
+           return ()
     | action == "h" || action == "-h" || action =="--help" = 
         do helptext
            return ()
