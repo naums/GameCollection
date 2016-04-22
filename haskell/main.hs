@@ -29,6 +29,7 @@ helptext =
     do progname <- getProgName
        versiontext
        putStrLn ("Usage: "++ progname ++ " (OPTIONS)")
+       putStrLn ("Will execute the options iteratively")
        putStrLn ("\nOptions:")
        putStrLn ("  -a | --add           add a game")
        putStrLn ("  -e | --edit          edit a game")
@@ -37,8 +38,9 @@ helptext =
        putStrLn ("  -p (int) | --price   query prices of a single game")
        putStrLn ("  -pa | --price-all    query prices of all games")
        putStrLn ("  -r | --clear-cache   clear price cache")
-       putStrLn ("  -s | --show          show the ebay cache")
-       putStrLn ("  -h | --help          show this helptext")
+       putStrLn ("  -s | --show          prints the ebay cache")
+       putStrLn ("  -h | --help          prints this helptext and exits")
+       putStrLn ("  -v | --version       prints the version-information and exits");
 
 versiontext :: IO()
 versiontext = 
