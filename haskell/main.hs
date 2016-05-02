@@ -47,6 +47,7 @@ helptext =
        putStrLn ("  -pa | --price-all    query prices of all games")
        putStrLn ("  -r | --clear-cache   clear price cache")
        putStrLn ("  -s | --show          prints the ebay cache")
+       putStrLn ("  --init               initiates the database tables")
        putStrLn ("  -h | --help          prints this helptext and exits")
        putStrLn ("  -v | --version       prints the version-information and exits");
 
@@ -100,6 +101,8 @@ runAction (action:args) conn
     | action == "r" || action == "-r" || action == "--clear-cache"  = 
         do ebayClearCache conn
            runAction args conn
+    | action == "--init" =
+        do initDatabase conn
     | action == "v" || action == "-v" || action =="--version" =
         do versiontext
            return ()
