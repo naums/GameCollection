@@ -28,6 +28,7 @@ initDatabase :: Connection -> IO(Bool)
 initDatabase conn = 
     do quickQuery' conn "CREATE TABLE IF NOT EXISTS game (id INT, title TEXT, developer TEXT, publisher TEXT" []
        quickQuery' conn "CREATE TABLE IF NOT EXISTS game_price (gameId INT, ebayTitle TEXT, ebayURL TEXT, ebayPrice FLOAT, ebayGallery TEXT)" []
+       return True;
 
 connectSQLite :: String -> IO(Connection)
 connectSQLite filepath = connectSqlite3 filepath

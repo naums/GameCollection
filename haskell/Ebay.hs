@@ -77,6 +77,22 @@ ebayListCache conn =
     do x <- quickQuery' conn "SELECT ebayPrice, ebayURL, ebayGallery, ebayTitle, gameId FROM game_price ORDER BY gameId ASC" []
        ebayPrintListRow x
 
+ebayPrintResultListItem :: [SqlValue] -> String
+ebayPrintResultListItem [] = ""
+ebayPrintResultListItem (price:url:gal:etitle:gameTitle:ys) = "{ \"gameTitle\" : \"" ++ fromSql gameTitle ++ "\", \"ebayPrice\": \"" ++ fromSql price ++ "€\", \"ebayTitle\" : \"" ++ fromSql etitle ++ "\", \"ebayGallery\": \""++ fromSql gal ++"\", \"ebayURL\": \"" ++ fromSql url ++ "\" }" 
+
+ebayPrintResultList :: [[SqlValue]] -> Int -> String
+ebayPrintResultList [] _ = ""
+ebayPrintResultList (x:xs) count
+    | count <= 0 = ebayPrintResultListItem x ++ ebayPrintResultList xs 1
+    | otherwise = "," ++ ebayPrintResultListItem x ++ ebayPrintResultList xs 1
+
+ebayPrintResults :: Connection -> String -> IO()
+ebayPrintResults _ [] = return ()
+ebayPrintResults conn name = 
+    do x <- quickQuery' conn ("SELECT ebayPrice, ebayURL, ebayGallery, ebayTitle, game.title FROM game_price JOIN game ON game.id = game_price.gameId WHERE game.title = '" ++ name ++ "'") []
+       putStrLn ( "[" ++ ebayPrintResultList x 0 ++ "]" )
+
 ebayStoreResults :: Connection -> Integer -> Maybe SearchResponse -> IO(Integer)
 ebayStoreResults conn gameId sr = case sr of    
     Nothing -> return(0)
