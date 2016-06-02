@@ -18,20 +18,28 @@ import Data.Text
 import GHC.Base
 import GHC.List
 
-ebayClearCache :: Connection -> IO(Integer)
+-- | empties the database for saving game-prices
+ebayClearCache :: Connection                -- ^ Database-connection
+               -> IO(Integer)               -- ^ returns how many rows were affected
 ebayClearCache conn = 
     do x <- run conn ("DELETE FROM game_price") []
        commit conn
        putStrLn ("Deleted " ++ (show x) ++ " rows");
        return x
 
-ebayQueryList :: Connection -> [Game] -> IO()
+-- | queries ebay for a list of games
+ebayQueryList :: Connection                 -- ^ Database-Connection
+              -> [Game]                     -- ^ list of games to query
+              -> IO()
 ebayQueryList _ [] = return ()
 ebayQueryList conn (x:xs) = 
     do ebayQuery conn x
        ebayQueryList conn xs
 
-ebayQuery :: Connection -> Game -> IO ()
+-- | queries ebay for a specific games
+ebayQuery :: Connection                     -- ^ Database-Connection
+          -> Game                           -- ^ the game for querying
+          -> IO ()
 ebayQuery conn (Game gameId title _ _) = 
     do searchResult <- simpleSearchWithVerb config searchRequest
        y <- ebayStoreResults conn gameId searchResult
@@ -60,46 +68,71 @@ ebayQuery conn (Game gameId title _ _) =
 
     searchRequest = SearchRequest FindItemsByKeywords search
 
-ebayPrintList :: [SqlValue] -> IO()
+-- | prints a list of Sqlvalues to stdout;
+--   used for printing queried prices
+ebayPrintList :: [SqlValue]                 -- ^ a database-row
+              -> IO()
 ebayPrintList [] = return ()
 ebayPrintList (a:b:c:d:e:xs) = 
     do putStrLn ((fromSql a) ++ ", " ++ fromSql b ++ ", " ++ fromSql c ++ ", " ++ fromSql d ++ ", " ++ (fromSql e))
        ebayPrintList xs
-    
-ebayPrintListRow :: [[SqlValue]] -> IO()
+
+-- | prints a row of the prices-table to stdout
+ebayPrintListRow :: [[SqlValue]]            -- ^ list of database-rows
+                 -> IO()
 ebayPrintListRow [] = return ()
 ebayPrintListRow (x:xs) = 
     do ebayPrintList x
        ebayPrintListRow xs
 
-ebayListCache :: Connection -> IO()
+-- | queries the already stored prices and prints the results to stdout
+ebayListCache :: Connection                 -- ^ Database-Conenction
+              -> IO()
 ebayListCache conn = 
     do x <- quickQuery' conn "SELECT ebayPrice, ebayURL, ebayGallery, ebayTitle, gameId FROM game_price ORDER BY gameId ASC" []
        ebayPrintListRow x
 
-ebayPrintResultListItem :: [SqlValue] -> String
+-- | creates a json-"object" as string and returns it
+--   from a queried game-price off the database
+ebayPrintResultListItem :: [SqlValue]       -- ^ the queried data, i.e. one row of it
+                        -> String           -- ^ a json-object as string representing the game-data
 ebayPrintResultListItem [] = ""
 ebayPrintResultListItem (price:url:gal:etitle:gameTitle:ys) = "{ \"gameTitle\" : \"" ++ fromSql gameTitle ++ "\", \"ebayPrice\": \"" ++ fromSql price ++ "€\", \"ebayTitle\" : \"" ++ fromSql etitle ++ "\", \"ebayGallery\": \""++ fromSql gal ++"\", \"ebayURL\": \"" ++ fromSql url ++ "\" }" 
 
-ebayPrintResultList :: [[SqlValue]] -> Int -> String
+-- | creates a JSON-array-content from a list of queried prices
+ebayPrintResultList :: [[SqlValue]]         -- ^ the queried rows
+                    -> Int                  -- ^ the number of already created object (for determination if there has to be an "," beforehand)
+                    -> String               -- ^ a json-array (without the [..]-brackets) representing all the queried rows
 ebayPrintResultList [] _ = ""
 ebayPrintResultList (x:xs) count
     | count <= 0 = ebayPrintResultListItem x ++ ebayPrintResultList xs 1
     | otherwise = "," ++ ebayPrintResultListItem x ++ ebayPrintResultList xs 1
 
-ebayPrintResults :: Connection -> String -> IO()
+-- | queries the prices of a game (by name) and prints these as JSON-array to stdout
+ebayPrintResults :: Connection              -- ^ Database-Connection
+                 -> String                  -- ^ the name of the game
+                 -> IO()                    
 ebayPrintResults _ [] = return ()
 ebayPrintResults conn name = 
     do x <- quickQuery' conn ("SELECT ebayPrice, ebayURL, ebayGallery, ebayTitle, game.title FROM game_price JOIN game ON game.id = game_price.gameId WHERE game.title = '" ++ name ++ "'") []
        putStrLn ( "[" ++ ebayPrintResultList x 0 ++ "]" )
 
-ebayStoreResults :: Connection -> Integer -> Maybe SearchResponse -> IO(Integer)
+-- | gets the response of ebay and will use the function ebayStoreSingleResult for every resulting object
+ebayStoreResults :: Connection              -- ^ Database-Connection
+                 -> Integer                 -- ^ The ID of the queried game
+                 -> Maybe SearchResponse    -- ^ maybe a searchResult of ebay, may also be nothing
+                 -> IO(Integer)             -- ^ returns the number of inserted objects
 ebayStoreResults conn gameId sr = case sr of    
     Nothing -> return(0)
     Just (SearchResponse _ SearchResult{..}) ->
         do ebayStoreSingleResult conn (searchResultItems) 0 gameId
-              
-ebayStoreSingleResult :: Connection -> [SearchItem] -> Integer -> Integer -> IO(Integer)
+
+-- | saves a single game inclusive price into the price-table of the database
+ebayStoreSingleResult :: Connection         -- ^ Database-Connection
+                      -> [SearchItem]       -- ^ list of resulting searchItems of ebay
+                      -> Integer            -- ^ the number of already processed elements (will be returned at the end)
+                      -> Integer            -- ^ ID of the queried game
+                      -> IO(Integer)        -- ^ number of stored game-prices
 ebayStoreSingleResult _ [] count _ = return count
 ebayStoreSingleResult conn (x:xs) count gameId = 
     do x <- run conn (
