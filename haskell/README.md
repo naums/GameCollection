@@ -12,10 +12,12 @@ The haskell-programm needs the following haskell-libraries (may be installed wit
 
 Download the .tar.gz-packages and install via
 
-  tar -xvf hsebaysdk-0.4.0.0.tar.gz
-  cd hsebaysdk-0.4.0.0
-  cabal install hsebaysdk.cabal
+```
+tar -xvf hsebaysdk-0.4.0.0.tar.gz
+cd hsebaysdk-0.4.0.0
+cabal install hsebaysdk.cabal
+```
 
 ## Usage
 
-See ./main --help for a list of valid parameters.  
+See `./main --help` for a list of valid parameters.  
