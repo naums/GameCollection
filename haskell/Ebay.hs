@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-{-
+{-|
 Module      : Ebay
 Description : functions for ebay-querying and price-saving
 Copyright   : (c) Stefan Naumann, 2016
@@ -15,6 +15,7 @@ searching by title of the game. Also: saving and retrieving
 the prices from the local database
 -}
 module Ebay where
+
 
 import SQLite
 import Game
