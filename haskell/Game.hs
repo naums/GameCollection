@@ -1,6 +1,15 @@
+{-|
+Module      : Game
+Description : contains functions for messing with Games and Game-Lists
+Copyright   : (c) Stefan Naumann, 2016
+License     : GPL-3
+Maintainer  : me@stefannaumann.de
+Stability   : experimental
+Portability : 
+-}
 module Game where
 
--- Game class for representating a game
+-- | Game class for representating a game
 data Game = Game {
     gameId :: Integer,                      -- ^ gameId the ID in the database of the game
     gameTitle :: String,                    -- ^ gameTitle the title of the game

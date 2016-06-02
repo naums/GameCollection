@@ -1,3 +1,17 @@
+{-|
+Module      : SQLite
+Description : used for database-manipulation and such stuff
+Copyright   : (c) Stefan Naumann, 2016
+License     : GPL-3
+Maintainer  : me@stefannaumann.de
+Stability   : experimental
+Portability : 
+
+This module incluse functions for retrieving mostly games,
+deleting games and managing all the stuff around it, like transferring
+the SQLvalues into Game-Objects
+-}
+
 module SQLite where
 import Game
 

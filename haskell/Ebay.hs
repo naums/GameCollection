@@ -1,7 +1,19 @@
--- crude experiments with the ebay API in Haskell
-
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+
+{-
+Module      : Ebay
+Description : functions for ebay-querying and price-saving
+Copyright   : (c) Stefan Naumann, 2016
+License     : GPL-3
+Maintainer  : me@stefannaumann.de
+Stability   : experimental
+Portability : 
+
+contains functions for retrieving prices for games from ebay, 
+searching by title of the game. Also: saving and retrieving 
+the prices from the local database
+-}
 module Ebay where
 
 import SQLite
@@ -49,7 +61,7 @@ ebayQuery conn (Game gameId title _ _) =
     keywords = pack(title)
     config = defaultEbayConfig { 
         ebDomain = "svcs.sandbox.ebay.com"
-         -- ^ Use `svcs.sandbox.ebay.com` when
+         --  Use `svcs.sandbox.ebay.com` when
          --   connecting to sandbox.
        , ebAppId = "StefanNa-GameAccu-SBX-33890c490-77cdf594"
        , ebDebug = False
