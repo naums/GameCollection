@@ -9,7 +9,8 @@ import Database.HDBC.Sqlite3
 -- getArgs
 import System.Environment
 
-inputNewGame :: IO(Game)
+-- | function for adding a new game via user-input on stdin
+inputNewGame :: IO(Game)                    -- ^ returns the newly added game
 inputNewGame = 
     do putStrLn "Titel: "
        t <- getLine
@@ -19,7 +20,8 @@ inputNewGame =
        p <- getLine
        return (Game 0 t d p)
 
-mainEditGame :: IO(Game)
+-- | allows for editing a game
+mainEditGame :: IO(Game)                    -- ^ returns the edited game
 mainEditGame = 
     do putStrLn "Welches Spiel bearbeiten (int):"
        i <- getLine 
@@ -31,6 +33,7 @@ mainEditGame =
        p <- getLine
        return (Game (read i::Integer) t d p)
 
+-- | prints a very long help-text
 helptext :: IO()
 helptext = 
     do progname <- getProgName
@@ -52,6 +55,7 @@ helptext =
        putStrLn ("  -h | --help          prints this helptext and exits")
        putStrLn ("  -v | --version       prints the version-information and exits");
 
+-- | print a version-text
 versiontext :: IO()
 versiontext = 
     do putStrLn ("Ebay Game-Retriever")
@@ -60,7 +64,10 @@ versiontext =
        putStrLn ("Version: 0x46 75 63 6B with Super-Cow-Powers. Really!")
        putStrLn ("Author: Stefan Naumann, 2016")
 
-runAction :: [String] -> Connection -> IO()
+-- | interprets the program-arguments one by one and executed the according actions
+runAction :: [String]                       -- ^ list of prorgam-arguments
+          -> Connection                     -- ^ Database-connection
+          -> IO()
 runAction [] _ = return ()
 runAction (action:args) conn
     | action == "a" || action == "-a" || action == "--add" = 
@@ -118,6 +125,7 @@ runAction (action:args) conn
         do putStrLn ("Unknown parameter")
            return ()
 
+-- | main-program
 main :: IO()
 main = do conn <- connectSQLite "game.db"
           args <- getArgs
