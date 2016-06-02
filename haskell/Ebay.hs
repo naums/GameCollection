@@ -8,7 +8,6 @@ Copyright   : (c) Stefan Naumann, 2016
 License     : GPL-3
 Maintainer  : me@stefannaumann.de
 Stability   : experimental
-Portability : 
 
 contains functions for retrieving prices for games from ebay, 
 searching by title of the game. Also: saving and retrieving 

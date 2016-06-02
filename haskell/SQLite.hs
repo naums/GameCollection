@@ -5,7 +5,6 @@ Copyright   : (c) Stefan Naumann, 2016
 License     : GPL-3
 Maintainer  : me@stefannaumann.de
 Stability   : experimental
-Portability : 
 
 This module incluse functions for retrieving mostly games,
 deleting games and managing all the stuff around it, like transferring

@@ -5,7 +5,6 @@ Copyright   : (c) Stefan Naumann, 2016
 License     : GPL-3
 Maintainer  : me@stefannaumann.de
 Stability   : experimental
-Portability : 
 -}
 module Game where
 
